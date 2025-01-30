@@ -121,4 +121,17 @@ class UserController extends Controller
             return response()->json(['error' => 'Error al eliminar usuario'], 500);
         }
     }
+
+    public function count()
+{
+    try {
+
+            $count =User::count();
+            return response()->json(['count' => $count]);
+
+    } catch (\Exception $e) {
+        Log::error('Error al obtener el conteo de usuarios: ' . $e->getMessage());
+        return response()->json(['count' => 0]);
+    }
+}
 }
