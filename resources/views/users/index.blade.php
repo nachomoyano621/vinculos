@@ -4,17 +4,10 @@
 <div class="container">
     <div class="row mb-3">
         <div class="col-12 d-flex justify-content-end gap-2">
-            <!-- Contenedor para botones de exportación (izquierda) -->
             <div id="exportButtonsContainer"></div>
-
-            <!-- Botón Nuevo Usuario (derecha) -->
             <button id="newUserButton" class="btn btn-primary">Nuevo</button>
         </div>
     </div>
-    </div>
-
-
-
 
     <table class="table table-bordered" id="usersTable">
         <thead>
@@ -28,7 +21,7 @@
     </table>
 </div>
 
-<!-- Modal -->
+<!-- Modal para Crear/Editar -->
 <div class="modal fade" id="userModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -55,7 +48,6 @@
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
                         <input type="password" class="form-control" id="password" name="password">
-                        <div id="passwordHelp" class="form-text"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -67,13 +59,13 @@
     </div>
 </div>
 
-<!-- Modal para Ver Detalles del Usuario -->
-<div class="modal fade" id="viewUserModal" tabindex="-1" aria-labelledby="viewUserModalLabel" aria-hidden="true">
+<!-- Modal para Ver Detalles -->
+<div class="modal fade" id="viewUserModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="viewUserModalLabel">Detalles del Usuario</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <h5 class="modal-title">Detalles del Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <div id="viewUserDetails">
@@ -93,6 +85,10 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.5.9/dist/sweetalert2.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.bootstrap5.min.css">
+<style>
+    .invalid-feedback { display: block; color: #dc3545; }
+    .is-invalid { border-color: #dc3545 !important; }
+</style>
 @endpush
 
 @push('scripts')
@@ -105,176 +101,172 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script>
-$('#usersTable').DataTable({
-    processing: true,
-    serverSide: true,
-    ajax: "{{ route('users.indexData') }}",
-    columns: [
-        { data: 'id' },
-        { data: 'name' },
-        { data: 'email' },
-        {
-            data: 'id',
-            render: function(data, type, row) {
-                return `
-                    <button class="btn btn-sm btn-warning edit-btn" data-id="${data}">
-                        <i class="fa fa-pencil-alt"></i>
-                    </button>
-                    <button class="btn btn-sm btn-info view-btn" data-id="${data}">
-                        <i class="fa fa-eye"></i>
-                    </button>
-                    <button class="btn btn-sm btn-danger delete-btn" data-id="${data}">
-                        <i class="fa fa-trash"></i>
-                    </button>
-                `;
-            }
+// Configuración global de Axios
+axios.interceptors.response.use(
+    response => response,
+    error => {
+        if (error.response?.status === 422) {
+            showValidationErrors(error.response.data.errors);
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.response?.data?.message || 'Error inesperado',
+            });
         }
-    ],
-    language: {
-        url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
-    },
-    columnDefs: [
-        {
-            targets: -1,
-            width: '120px',
-            orderable: false
-        }
-    ],
-    dom: 'Bfrtip',
-    buttons: [
-        {
-            extend: 'excelHtml5',
-            text: 'Excel',
-            className: 'btn btn-success me-2',  // Agregar margen a la derecha
-            container: '#exportButtonsContainer' // Especificar el contenedor
-        },
-        {
-            extend: 'pdfHtml5',
-            text: 'PDF',
-            className: 'btn btn-danger',
-            container: '#exportButtonsContainer' // Especificar el contenedor
-        }
-    ]
-});
+        return Promise.reject(error);
+    }
+);
 
-$('#newUserButton').click(function() {
-    $('#userForm')[0].reset();
-    $('#userId').val('');
-    $('#userModal .modal-title').text('Nuevo Usuario');
-    $('#password').prop('required', true);
+// Función para mostrar errores de validación
+function showValidationErrors(errors) {
+    $('#validationErrors').removeClass('d-none');
+    $('#errorList').empty();
+
+    Object.entries(errors).forEach(([field, messages]) => {
+        $(`#${field}`).addClass('is-invalid');
+        $(`#${field}`).after(`<div class="invalid-feedback">${messages[0]}</div>`);
+    });
+}
+
+// Función para limpiar errores
+function clearValidationErrors() {
     $('#validationErrors').addClass('d-none');
     $('#errorList').empty();
-    const modal = new bootstrap.Modal(document.getElementById('userModal'));
-    modal.show();
-});
+    $('.is-invalid').removeClass('is-invalid');
+    $('.invalid-feedback').remove();
+}
 
-$('#usersTable').on('click', '.edit-btn', function() {
-    $('#userForm')[0].reset();
-    const userId = $(this).data('id');
-
-    axios.get(`/users/${userId}`)
-        .then(response => {
-            const user = response.data;
-            $('#userId').val(user.id);
-            $('#name').val(user.name);
-            $('#email').val(user.email);
-            $('#password').val(user.password || '');
-            $('#password').prop('required', false);
-            $('#userModal .modal-title').text('Editar Usuario');
-            $('#validationErrors').addClass('d-none');
-            $('#errorList').empty();
-            const modal = new bootstrap.Modal(document.getElementById('userModal'));
-            modal.show();
-        })
-        .catch(error => {
-            console.error('Error al obtener usuario:', error);
-        });
-});
-
-$('#userForm').submit(function(e) {
-    e.preventDefault();
-    const formData = {
-        name: $('#name').val(),
-        email: $('#email').val(),
-        password: $('#password').val(),
-    };
-
-    const userId = $('#userId').val();
-    const url = userId ? `/users/${userId}` : '/users';
-    const method = userId ? 'put' : 'post';
-
-    axios({
-        method: method,
-        url: url,
-        data: formData,
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    })
-    .then(response => {
-        $('#usersTable').DataTable().ajax.reload();
-        $('#userModal').modal('hide');
-        Swal.fire({
-            icon: 'success',
-            title: 'Usuario guardado exitosamente',
-            showConfirmButton: false,
-            timer: 1500
-        });
-    })
-    .catch(error => {
-        console.error('Error al guardar:', error.response.data);
-        $('#validationErrors').removeClass('d-none');
-        $('#errorList').empty();
-        $.each(error.response.data.errors, function(key, value) {
-            $('#errorList').append(`<li>${value}</li>`);
-        });
+// DataTable
+$(document).ready(function() {
+    const table = $('#usersTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "{{ route('users.indexData') }}",
+        columns: [
+            { data: 'id' },
+            { data: 'name' },
+            { data: 'email' },
+            {
+                data: 'id',
+                render: function(data) {
+                    return `
+                        <button class="btn btn-sm btn-info view-btn" data-id="${data}">
+                            <i class="fa fa-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-warning edit-btn" data-id="${data}">
+                            <i class="fa fa-pencil-alt"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger delete-btn" data-id="${data}">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    `;
+                }
+            }
+        ],
+        language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
+        dom: 'Bfrtip',
+        buttons: [
+            {
+                extend: 'excelHtml5',
+                text: '<i class="fas fa-file-excel"></i> Excel',
+                className: 'btn btn-success'
+            },
+            {
+                extend: 'pdfHtml5',
+                text: '<i class="fas fa-file-pdf"></i> PDF',
+                className: 'btn btn-danger'
+            }
+        ]
     });
-});
 
-$('#usersTable').on('click', '.view-btn', function() {
-    const userId = $(this).data('id');
-    axios.get(`/users/${userId}`)
-        .then(response => {
-            const user = response.data;
-            $('#viewName').text(user.name);
-            $('#viewEmail').text(user.email);
-            const modal = new bootstrap.Modal(document.getElementById('viewUserModal'));
-            modal.show();
-        })
-        .catch(error => {
-            console.error('Error al obtener usuario:', error);
-        });
-});
+    // Nuevo Usuario
+    $('#newUserButton').click(() => {
+        $('#userForm')[0].reset();
+        $('#userId').val('');
+        $('#password').prop('required', true);
+        clearValidationErrors();
+        new bootstrap.Modal('#userModal').show();
+    });
 
-$('#usersTable').on('click', '.delete-btn', function() {
-    const userId = $(this).data('id');
-    Swal.fire({
-        title: '¿Estás seguro?',
-        text: 'No podrás revertir esta acción.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            axios.delete(`/users/${userId}`)
-                .then(response => {
-                    $('#usersTable').DataTable().ajax.reload();
-                    Swal.fire(
-                        'Eliminado!',
-                        'El usuario ha sido eliminado.',
-                        'success'
-                    );
-                })
-                .catch(error => {
-                    console.error('Error al eliminar usuario:', error);
+    // Editar Usuario
+    $('#usersTable').on('click', '.edit-btn', function() {
+        const userId = $(this).data('id');
+        axios.get(`/users/${userId}`)
+            .then(response => {
+                $('#userId').val(response.data.id);
+                $('#name').val(response.data.name);
+                $('#email').val(response.data.email);
+                $('#password').prop('required', false);
+                clearValidationErrors();
+                new bootstrap.Modal('#userModal').show();
+            });
+    });
+
+    // Enviar Formulario
+    $('#userForm').submit(function(e) {
+        e.preventDefault();
+        clearValidationErrors();
+
+        const formData = {
+            name: $('#name').val(),
+            email: $('#email').val(),
+            password: $('#password').val(),
+        };
+
+        const userId = $('#userId').val();
+        const method = userId ? 'put' : 'post';
+        const url = userId ? `/users/${userId}` : '/users';
+
+        axios[method](url, formData)
+            .then(() => {
+                table.ajax.reload();
+                $('#userModal').modal('hide');
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: 'Operación realizada correctamente',
+                    timer: 1500
                 });
-        }
+            });
+    });
+
+    // Ver Detalles
+    $('#usersTable').on('click', '.view-btn', function() {
+        const userId = $(this).data('id');
+        axios.get(`/users/${userId}`)
+            .then(response => {
+                $('#viewName').text(response.data.name);
+                $('#viewEmail').text(response.data.email);
+                new bootstrap.Modal('#viewUserModal').show();
+            });
+    });
+
+    // Eliminar Usuario
+    $('#usersTable').on('click', '.delete-btn', function() {
+        const userId = $(this).data('id');
+        Swal.fire({
+            title: '¿Eliminar usuario?',
+            text: "Esta acción no se puede deshacer",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Eliminar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.delete(`/users/${userId}`)
+                    .then(() => {
+                        table.ajax.reload();
+                        Swal.fire('¡Eliminado!', '', 'success');
+                    });
+            }
+        });
     });
 });
 </script>
 @endpush
-
 @endsection
