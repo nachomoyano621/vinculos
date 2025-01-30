@@ -5,7 +5,7 @@
     <div class="row mb-3">
         <div class="col-12 d-flex justify-content-end gap-2">
             <div id="exportButtonsContainer"></div>
-            <button id="newUserButton" class="btn btn-primary">Nuevo</button>
+            <button id="newUserButton" class="btn btn-primary">+ Nuevo</button>
         </div>
     </div>
 
@@ -109,29 +109,35 @@ axios.interceptors.response.use(
     response => response,
     error => {
         if (error.response?.status === 422) {
+            // Si es un error de validación, mostrar los errores del backend
             showValidationErrors(error.response.data.errors);
         } else {
+            // Si no es un error de validación, mostrar el mensaje que venga del backend
+            const errorMessage = error.response?.data?.message || 'Error inesperado';
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: error.response?.data?.message || 'Error inesperado',
+                text: errorMessage,
             });
         }
         return Promise.reject(error);
     }
 );
 
-// Función para mostrar errores de validación
 function showValidationErrors(errors) {
-    $('#validationErrors').removeClass('d-none');
-    $('#errorList').empty();
+    // Concatenar todos los errores y mostrarlo en SweetAlert
+    let errorMessages = '';
+    for (let field in errors) {
+        errorMessages += errors[field].join('<br>') + '<br>';
+    }
 
-    Object.entries(errors).forEach(([field, messages]) => {
-        $(`#${field}`).addClass('is-invalid');
-        $(`#${field}`).after(`<div class="invalid-feedback">${messages[0]}</div>`);
+    Swal.fire({
+        icon: 'error',
+        title: 'Errores de validación',
+        html: errorMessages,
+        confirmButtonText: 'Cerrar',
     });
 }
-
 // Función para limpiar errores
 function clearValidationErrors() {
     $('#validationErrors').addClass('d-none');
