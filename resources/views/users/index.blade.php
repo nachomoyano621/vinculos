@@ -134,7 +134,7 @@ function clearValidationErrors() {
     $('.invalid-feedback').remove();
 }
 
-// DataTable
+//Datatable
 $(document).ready(function() {
     const table = $('#usersTable').DataTable({
         processing: true,
@@ -161,6 +161,14 @@ $(document).ready(function() {
                 }
             }
         ],
+        columnDefs: [
+            {
+                targets: -1, // Aplica la configuración a la última columna (Acciones)
+                width: '120px', // Ancho de la columna (ajusta el valor según sea necesario)
+                orderable: false, // Para que no sea ordenable
+                className: 'text-center', // Alinea los botones en el centro
+            }
+        ],
         language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
         dom: 'Bfrtip',
         buttons: [
@@ -176,6 +184,8 @@ $(document).ready(function() {
             }
         ]
     });
+
+
 
     // Nuevo Usuario
     $('#newUserButton').click(() => {
