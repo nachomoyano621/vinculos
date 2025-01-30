@@ -28,7 +28,7 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    axios.get("{{ route('users.count') }}") // No need for withCredentials if using CSRF
+    axios.get("{{ route('users.count') }}")
         .then(function(response) {
             document.getElementById('userCount').innerText = response.data.count;
         })

@@ -12,7 +12,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        return view('users.index'); // Solo carga la vista
+        return view('users.index');
     }
 
     public function indexData()
@@ -29,7 +29,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
         try {
-            // Validación de datos con mensajes personalizados
+
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|max:255|unique:users,email,' . $request->id,
@@ -55,10 +55,10 @@ class UserController extends Controller
 
             return response()->json($user);
         } catch (ValidationException $e) {
-            // Si ocurre un error de validación, puedes personalizar el mensaje
+
             return response()->json([
                 'message' => 'Error en la validación',
-                'errors' => $e->errors(), // Devuelve los errores de validación
+                'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
             Log::error("Error al guardar/actualizar usuario: " . $e->getMessage());
@@ -69,7 +69,7 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            // Validación de datos con mensajes personalizados
+
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|max:255|unique:users,email,' . $id,
@@ -90,10 +90,10 @@ class UserController extends Controller
 
             return response()->json($user);
         } catch (ValidationException $e) {
-            // Si ocurre un error de validación, puedes personalizar el mensaje
+
             return response()->json([
                 'message' => 'Error en la validación',
-                'errors' => $e->errors(), // Devuelve los errores de validación
+                'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
             Log::error("Error al actualizar usuario: " . $e->getMessage());
