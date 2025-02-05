@@ -9,46 +9,53 @@
     <div class="row">
         <!-- Card de Usuarios -->
         <div class="col-md-3 mb-4">
-            <div class="card text-white bg-primary h-100">
-                <div class="card-body d-flex flex-column justify-content-center align-items-center">
-                    <h4 class="card-title mb-3">USUARIOS</h4>
-                    <div class="count-wrapper text-center">
-                        <span class="count-number fs-1" id="userCount" style="letter-spacing: 2px;">
-                            <i class="fa fa-spinner fa-spin fa-1x"></i>
-                        </span>
+            <a href="{{ route('users.index') }}" style="text-decoration: none;">
+                <div class="card text-white bg-primary h-100">
+                    <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                        <h4 class="card-title mb-3">USUARIOS</h4>
+                        <div class="count-wrapper text-center">
+                            <span class="count-number fs-1" id="userCount" style="letter-spacing: 2px;">
+                                <i class="fa fa-spinner fa-spin fa-1x"></i>
+                            </span>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
         <!-- Card de Obras Sociales -->
         <div class="col-md-3 mb-4">
-            <div class="card text-white bg-success h-100">
-                <div class="card-body d-flex flex-column justify-content-center align-items-center">
-                    <h4 class="card-title mb-3">OBRAS SOCIALES</h4>
-                    <div class="count-wrapper text-center">
-                        <span class="count-number fs-1" id="osocialCount" style="letter-spacing: 2px;">
-                            <i class="fa fa-spinner fa-spin fa-1x"></i>
-                        </span>
+            <a href="{{ route('osocial.index') }}" style="text-decoration: none;">
+                <div class="card text-white bg-success h-100">
+                    <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                        <h4 class="card-title mb-3">OBRAS SOCIALES</h4>
+                        <div class="count-wrapper text-center">
+                            <span class="count-number fs-1" id="osocialCount" style="letter-spacing: 2px;">
+                                <i class="fa fa-spinner fa-spin fa-1x"></i>
+                            </span>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
         <!-- Card de Pacientes -->
         <div class="col-md-3 mb-4">
-            <div class="card text-white bg-danger h-100">
-                <div class="card-body d-flex flex-column justify-content-center align-items-center">
-                    <h4 class="card-title mb-3">PACIENTES</h4>
-                    <div class="count-wrapper text-center">
-                        <span class="count-number fs-1" id="pacienteCount" style="letter-spacing: 2px;">
-                            <i class="fa fa-spinner fa-spin fa-1x"></i>
-                        </span>
+            <a href="{{ route('pacientes.index') }}" style="text-decoration: none;">
+                <div class="card text-white bg-danger h-100">
+                    <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                        <h4 class="card-title mb-3">PACIENTES</h4>
+                        <div class="count-wrapper text-center">
+                            <span class="count-number fs-1" id="pacienteCount" style="letter-spacing: 2px;">
+                                <i class="fa fa-spinner fa-spin fa-1x"></i>
+                            </span>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
 </div>
 @endsection
+
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {

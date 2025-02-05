@@ -2,6 +2,7 @@
 
 @section('content')
 <div class="container">
+<h1 class="text-center mb-4">PACIENTES</h1>
     <div class="row mb-3">
         <div class="col-12 d-flex justify-content-end gap-2">
             <div id="exportButtonsContainer"></div>
