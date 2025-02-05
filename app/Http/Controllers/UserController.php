@@ -6,15 +6,16 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use DataTables;
 use Log;
-use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
+    // Vista principal de usuarios
     public function index()
     {
         return view('users.index');
     }
 
+    // Obtener datos para DataTables
     public function indexData()
     {
         try {
@@ -26,36 +27,44 @@ class UserController extends Controller
         }
     }
 
+    // Validaciones reutilizables
+    private function getValidationRules($id = null)
+    {
+        return [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $id,
+            'password' => 'nullable|string|min:8',
+        ];
+    }
+
+    private function getValidationMessages()
+    {
+        return [
+            'name.required' => 'El nombre es obligatorio.',
+            'name.string' => 'El nombre debe ser una cadena de texto.',
+            'name.max' => 'El nombre no puede tener más de 255 caracteres.',
+            'email.required' => 'El correo es obligatorio.',
+            'email.email' => 'El correo debe ser una dirección de correo electrónico válida.',
+            'email.max' => 'El correo no puede tener más de 255 caracteres.',
+            'email.unique' => 'Ya existe un usuario con este correo.',
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
+        ];
+    }
+
+    // Crear o actualizar un usuario
     public function store(Request $request)
     {
         try {
+            $validated = $request->validate(
+                $this->getValidationRules($request->id),
+                $this->getValidationMessages()
+            );
 
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|max:255|unique:users,email,' . $request->id,
-                'password' => 'nullable|string|min:8',
-            ], [
-                'name.required' => 'El nombre es obligatorio.',
-                'name.string' => 'El nombre debe ser una cadena de texto.',
-                'name.max' => 'El nombre no puede tener más de 255 caracteres.',
-                'email.required' => 'El correo es obligatorio.',
-                'email.email' => 'El correo debe ser una dirección de correo electrónico válida.',
-                'email.max' => 'El correo no puede tener más de 255 caracteres.',
-                'email.unique' => 'Ya existe un usuario con este correo.',
-                'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
-            ]);
-
-            // Si tiene un ID, es una actualización, si no, es una creación
-            if ($request->id) {
-                $user = User::find($request->id);
-                $user->update($validated);
-            } else {
-                $user = User::create($validated);
-            }
+            $user = $request->id ? User::findOrFail($request->id) : new User();
+            $user->fill($validated)->save();
 
             return response()->json($user);
-        } catch (ValidationException $e) {
-
+        } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'message' => 'Error en la validación',
                 'errors' => $e->errors(),
@@ -66,41 +75,15 @@ class UserController extends Controller
         }
     }
 
+    // Actualizar un usuario por ID
     public function update(Request $request, $id)
     {
-        try {
-
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|max:255|unique:users,email,' . $id,
-                'password' => 'nullable|string|min:8',
-            ], [
-                'name.required' => 'El nombre es obligatorio.',
-                'name.string' => 'El nombre debe ser una cadena de texto.',
-                'name.max' => 'El nombre no puede tener más de 255 caracteres.',
-                'email.required' => 'El correo es obligatorio.',
-                'email.email' => 'El correo debe ser una dirección de correo electrónico válida.',
-                'email.max' => 'El correo no puede tener más de 255 caracteres.',
-                'email.unique' => 'Ya existe un usuario con este correo.',
-                'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
-            ]);
-
-            $user = User::findOrFail($id);
-            $user->update($validated);
-
-            return response()->json($user);
-        } catch (ValidationException $e) {
-
-            return response()->json([
-                'message' => 'Error en la validación',
-                'errors' => $e->errors(),
-            ], 422);
-        } catch (\Exception $e) {
-            Log::error("Error al actualizar usuario: " . $e->getMessage());
-            return response()->json(['error' => 'Error al actualizar usuario'], 500);
-        }
+        // Agregar el ID del usuario a la solicitud para que la validación funcione correctamente
+        $request->merge(['id' => $id]);
+        return $this->store($request); // Reutiliza el método store
     }
 
+    // Mostrar un usuario específico
     public function show(User $user)
     {
         try {
@@ -111,10 +94,11 @@ class UserController extends Controller
         }
     }
 
+    // Eliminar un usuario
     public function destroy(User $user)
     {
         try {
-            $user->delete();
+            $user->delete(); // Esto realiza una eliminación lógica (soft delete)
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             Log::error("Error al eliminar usuario: " . $e->getMessage());
@@ -122,16 +106,15 @@ class UserController extends Controller
         }
     }
 
+    // Conteo de usuarios
     public function count()
-{
-    try {
-
-            $count =User::count();
+    {
+        try {
+            $count = User::count();
             return response()->json(['count' => $count]);
-
-    } catch (\Exception $e) {
-        Log::error('Error al obtener el conteo de usuarios: ' . $e->getMessage());
-        return response()->json(['count' => 0]);
+        } catch (\Exception $e) {
+            Log::error('Error al obtener el conteo de usuarios: ' . $e->getMessage());
+            return response()->json(['count' => 0]);
+        }
     }
-}
 }
