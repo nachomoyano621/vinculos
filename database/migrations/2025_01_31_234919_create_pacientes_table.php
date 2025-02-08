@@ -23,7 +23,7 @@ class CreatePacientesTable extends Migration
 
                 // Clave foránea corregida
                 $table->foreignId('osocial_id')->constrained('osocial')->onDelete('cascade');
-
+                $table->softDeletes(); // Columna deleted_at para Soft Deletes
                 $table->timestamps();
             });
         }

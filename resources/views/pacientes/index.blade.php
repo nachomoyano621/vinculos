@@ -268,6 +268,9 @@ $(document).ready(function () {
                         <button class="btn btn-sm btn-danger delete-btn" data-id="${data}">
                             <i class="fa fa-trash"></i>
                         </button>
+                        <a href="/pacientes/${data}/notas" class="btn btn-sm btn-success">
+                <i class="fa fa-sticky-note"></i>
+            </a>
                     `;
                 }
             }
@@ -275,7 +278,7 @@ $(document).ready(function () {
         columnDefs: [
             {
                 targets: -1,
-                width: '120px',
+                width: '160px',
                 orderable: false,
                 className: 'text-center',
             }

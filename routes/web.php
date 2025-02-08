@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OSocialController;
 use App\Http\Controllers\PacienteController;
+use App\Http\Controllers\NotaController;
 use Illuminate\Support\Facades\Route;
 
 // Autenticación
@@ -42,6 +43,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/show/{paciente}', [PacienteController::class, 'show'])->name('pacientes.show');
         Route::delete('/destroy/{paciente}', [PacienteController::class, 'destroy'])->name('pacientes.destroy');
         Route::get('/count', [OSocialController::class, 'count'])->name('pacientes.count');
+        Route::get('/{id}/notas', [PacienteController::class, 'verNotas'])->name('pacientes.notas');
+        Route::get('/{id}/notas/data', [PacienteController::class, 'notasData'])->name('pacientes.notas.data');
+    });   
+
+    Route::prefix('notas')->group(function () {
+        Route::get('/', [NotaController::class, 'index'])->name('notas.index');
+        Route::post('/store', [NotaController::class, 'store'])->name('notas.store');
+        Route::get('/{id}', [NotaController::class, 'show'])->name('notas.show');
+        Route::put('/{id}', [NotaController::class, 'update'])->name('notas.update');
+        Route::delete('/{id}', [NotaController::class, 'destroy'])->name('notas.destroy');
     });
 });
 

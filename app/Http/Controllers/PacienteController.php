@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Paciente;
+use App\Models\Nota;
 use App\Models\OSocial;
 use Illuminate\Http\Request;
 use DataTables;
@@ -112,6 +113,56 @@ class PacienteController extends Controller
             return response()->json(['error' => 'Error al eliminar paciente'], 500);
         }
     }
+    public function verNotas($id)
+    {
+        try {
+            // Buscar el paciente y cargar sus notas ordenadas por fecha de creación (descendente)
+            $paciente = Paciente::with(['notas' => function ($query) {
+                $query->orderBy('created_at', 'desc'); // Ordenar de más reciente a menos reciente
+            }])->findOrFail($id);
+    
+            // Pasar los datos a la vista
+            return view('pacientes.notas', compact('paciente'));
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            // Si el paciente no existe, redirigir con un mensaje de error
+            return redirect()->route('pacientes.index')->with('error', 'El paciente no existe.');
+        } catch (\Exception $e) {
+            Log::error("Error al obtener las notas del paciente: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al obtener las notas del paciente.');
+        }
+    }
+
+public function notasData($id)
+{
+    try {
+        // Obtener las notas del paciente como query (sin ejecutar todavía)
+        $notas = Nota::where('paciente_id', $id);
+
+        // Devolver los datos en el formato esperado por DataTables
+        return DataTables::of($notas)
+            ->editColumn('created_at', function ($nota) {
+                return $nota->created_at ? $nota->created_at->format('d/m/Y H:i:s') : 'Sin fecha';
+            })
+            ->addColumn('acciones', function ($nota) {
+                return '
+                    <button class="btn btn-sm btn-info view-btn" data-id="' . $nota->id . '">
+                        <i class="fa fa-eye"></i>
+                    </button>
+                    <button class="btn btn-sm btn-warning edit-btn" data-id="' . $nota->id . '">
+                        <i class="fa fa-pencil-alt"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger delete-btn" data-id="' . $nota->id . '">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                ';
+            })
+            ->rawColumns(['acciones']) // Para que las acciones se rendericen como HTML
+            ->toJson();
+    } catch (\Exception $e) {
+        Log::error("Error al obtener notas: " . $e->getMessage());
+        return response()->json(['error' => 'Error al obtener notas'], 500);
+    }
+}
      // Conteo de usuarios
      public function count()
      {
