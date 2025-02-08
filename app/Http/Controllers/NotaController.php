@@ -36,15 +36,25 @@ class NotaController extends Controller
     public function store(Request $request)
     {
         try {
-            // Validar los datos
+            // Validar los datos con mensajes en castellano
             $validated = $request->validate([
                 'paciente_id' => 'required|exists:pacientes,id',
+                'titulo' => 'required|string|max:255', // Nuevo campo
                 'nombre' => 'required|string|max:1000|min:10',
+            ], [
+                'paciente_id.required' => 'El ID del paciente es obligatorio.',
+                'paciente_id.exists' => 'El paciente seleccionado no existe.',
+                'titulo.required' => 'El título es obligatorio.',
+                'titulo.max' => 'El título no puede tener más de 255 caracteres.',
+                'nombre.required' => 'La nota es obligatoria.',
+                'nombre.max' => 'La nota no puede tener más de 1000 caracteres.',
+                'nombre.min' => 'La nota debe tener al menos 10 caracteres.',
             ]);
 
             // Crear la nota con el ID del usuario autenticado
             $nota = Nota::create([
                 'paciente_id' => $validated['paciente_id'],
+                'titulo' => $validated['titulo'], // Nuevo campo
                 'nombre' => $validated['nombre'],
                 'usuario_registro' => auth()->id(), // ID del usuario autenticado
             ]);
@@ -67,9 +77,16 @@ class NotaController extends Controller
         try {
             $nota = Nota::findOrFail($id);
 
-            // Validar los datos
+            // Validar los datos con mensajes en castellano
             $validated = $request->validate([
+                'titulo' => 'sometimes|required|string|max:255', // Nuevo campo
                 'nombre' => 'sometimes|required|string|max:1000|min:10',
+            ], [
+                'titulo.required' => 'El título es obligatorio.',
+                'titulo.max' => 'El título no puede tener más de 255 caracteres.',
+                'nombre.required' => 'La nota es obligatoria.',
+                'nombre.max' => 'La nota no puede tener más de 1000 caracteres.',
+                'nombre.min' => 'La nota debe tener al menos 10 caracteres.',
             ]);
 
             // Actualizar la nota

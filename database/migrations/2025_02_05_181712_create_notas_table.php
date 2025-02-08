@@ -11,6 +11,7 @@ class CreateNotasTable extends Migration
         Schema::create('notas', function (Blueprint $table) {
             $table->id(); // ID autoincremental
             $table->foreignId('paciente_id')->constrained()->onDelete('cascade'); // Relación con pacientes
+            $table->string('titulo')->nullable(false)->comment('Título de la nota, máximo 255 caracteres'); // Nuevo campo
             $table->text('nombre')->nullable(false)->comment('Texto de la nota, máximo 1000 caracteres');
             $table->string('usuario_registro')->nullable(false)->comment('Usuario que registró la nota');
             $table->timestamps(); // Columnas created_at y updated_at

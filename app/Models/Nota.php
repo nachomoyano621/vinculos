@@ -15,6 +15,7 @@ class Nota extends Model
         'paciente_id',
         'nombre',
         'usuario_registro',
+        'titulo'
     ];
 
     // Relación inversa con Paciente
