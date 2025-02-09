@@ -5,6 +5,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\OSocialController;
 use App\Http\Controllers\PacienteController;
 use App\Http\Controllers\NotaController;
+use App\Http\Controllers\ProfesionController;
 use Illuminate\Support\Facades\Route;
 
 // Autenticación
@@ -54,6 +55,17 @@ Route::middleware('auth')->group(function () {
         Route::put('/{id}', [NotaController::class, 'update'])->name('notas.update');
         Route::delete('/{id}', [NotaController::class, 'destroy'])->name('notas.destroy');
     });
+    
+
+Route::prefix('profesiones')->group(function () {
+    Route::get('/', [ProfesionController::class, 'index'])->name('profesiones.index');
+    Route::get('/data', [ProfesionController::class, 'indexData'])->name('profesiones.indexData'); // Ruta para DataTables
+    Route::post('/', [ProfesionController::class, 'store'])->name('profesiones.store');
+    Route::put('/{id}', [ProfesionController::class, 'update'])->name('profesiones.update');
+    Route::get('/{id}', [ProfesionController::class, 'show'])->name('profesiones.show');
+    Route::delete('/{id}', [ProfesionController::class, 'destroy'])->name('profesiones.destroy');
+    Route::get('/count', [OSocialController::class, 'count'])->name('profesiones.count');
+});
 });
 
 
