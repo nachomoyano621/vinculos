@@ -163,6 +163,19 @@ $(document).ready(function () {
         }
     ],
     language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
+    dom: 'Bfrtip',
+        buttons: [
+            {
+                extend: 'excelHtml5',
+                text: '<i class="fas fa-file-excel"></i> Excel',
+                className: 'btn btn-success'
+            },
+            {
+                extend: 'pdfHtml5',
+                text: '<i class="fas fa-file-pdf"></i> PDF',
+                className: 'btn btn-danger'
+            }
+        ],
     order: [[2, 'desc']] // Ordenar por la columna de fecha de creación (índice 2) de forma descendente
 });
     // Botón para abrir el modal de Nueva Nota
