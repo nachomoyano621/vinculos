@@ -18,8 +18,8 @@ Route::post('/register', [AuthController::class, 'register']);
 // CRUD Usuarios (protegido)
 Route::middleware('auth')->group(function () {
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('users/count', [UserController::class, 'count'])->name('users.count');
+    Route::get('/counts', [UserController::class, 'getCounts'])->name('counts');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');   
     Route::get('/users/data', [UserController::class, 'indexData'])->name('users.indexData');
     Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
@@ -33,7 +33,6 @@ Route::middleware('auth')->group(function () {
         Route::put('/update/{id}', [OSocialController::class, 'update'])->name('osocial.update');
         Route::get('/show/{osocial}', [OSocialController::class, 'show'])->name('osocial.show');
         Route::delete('/destroy/{osocial}', [OSocialController::class, 'destroy'])->name('osocial.destroy');
-        Route::get('/count', [OSocialController::class, 'count'])->name('osocial.count');
         Route::get('/osocial/all', [OSocialController::class, 'getAll'])->name('osocial.all');
     });
     Route::prefix('pacientes')->group(function () {
@@ -43,7 +42,6 @@ Route::middleware('auth')->group(function () {
         Route::put('/update/{id}', [PacienteController::class, 'update'])->name('pacientes.update');
         Route::get('/show/{paciente}', [PacienteController::class, 'show'])->name('pacientes.show');
         Route::delete('/destroy/{paciente}', [PacienteController::class, 'destroy'])->name('pacientes.destroy');
-        Route::get('/count', [OSocialController::class, 'count'])->name('pacientes.count');
         Route::get('/{id}/notas', [PacienteController::class, 'verNotas'])->name('pacientes.notas');
         Route::get('/{id}/notas/data', [PacienteController::class, 'notasData'])->name('pacientes.notas.data');
     });   
@@ -63,8 +61,7 @@ Route::prefix('profesiones')->group(function () {
     Route::post('/', [ProfesionController::class, 'store'])->name('profesiones.store');
     Route::put('/{id}', [ProfesionController::class, 'update'])->name('profesiones.update');
     Route::get('/{id}', [ProfesionController::class, 'show'])->name('profesiones.show');
-    Route::delete('/{id}', [ProfesionController::class, 'destroy'])->name('profesiones.destroy');
-    Route::get('/count', [OSocialController::class, 'count'])->name('profesiones.count');
+    Route::delete('/{id}', [ProfesionController::class, 'destroy'])->name('profesiones.destroy');  
 });
 });
 

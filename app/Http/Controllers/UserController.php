@@ -6,6 +6,10 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use DataTables;
 use Log;
+use App\Models\OSocial;
+use App\Models\Paciente;
+use App\Models\Profesion;
+
 
 class UserController extends Controller
 {
@@ -106,15 +110,29 @@ class UserController extends Controller
         }
     }
 
-    // Conteo de usuarios
-    public function count()
+    public function getCounts()
     {
         try {
-            $count = User::count();
-            return response()->json(['count' => $count]);
+            $userCount = User::count();
+            $osocialCount = OSocial::count();
+            $pacienteCount = Paciente::count();
+            $profesionCount = Profesion::count();
+    
+            return response()->json([
+                'userCount' => $userCount,
+                'osocialCount' => $osocialCount,
+                'pacienteCount' => $pacienteCount,
+                'profesionCount' => $profesionCount
+            ]);
         } catch (\Exception $e) {
-            Log::error('Error al obtener el conteo de usuarios: ' . $e->getMessage());
-            return response()->json(['count' => 0]);
+            Log::error('Error al obtener los conteos: ' . $e->getMessage());
+            return response()->json([
+                'userCount' => 0,
+                'osocialCount' => 0,
+                'pacienteCount' => 0,
+                'profesionCount' => 0
+            ]);
         }
     }
+    
 }

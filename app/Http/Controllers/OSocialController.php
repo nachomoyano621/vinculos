@@ -98,19 +98,9 @@ class OSocialController extends Controller
             return response()->json(['error' => 'Error al eliminar obra social'], 500);
         }
     }
-    // Conteo de usuarios
-    public function count()
-    {
-        try {
-            $count = OSocial::count();
-            return response()->json(['count' => $count]);
-        } catch (\Exception $e) {
-            Log::error('Error al obtener el conteo de osocial: ' . $e->getMessage());
-            return response()->json(['count' => 0]);
-        }
-    }
+   
     public function getAll()
-{
+    {
     try {
         $osocials = OSocial::select('id', 'nombre')->get();
         return response()->json($osocials);
@@ -118,5 +108,5 @@ class OSocialController extends Controller
         Log::error("Error al obtener obras sociales: " . $e->getMessage());
         return response()->json(['error' => 'Error al obtener obras sociales'], 500);
     }
-}
+    }
 }

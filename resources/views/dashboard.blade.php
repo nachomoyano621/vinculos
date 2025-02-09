@@ -75,33 +75,25 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    // Mostrar el spinner de carga en todas las tarjetas
-    const spinners = document.querySelectorAll('.fa-spinner');
-    spinners.forEach(spinner => spinner.classList.remove('d-none'));
-
-    // URLs de las APIs
-    const urls = [
-        { id: 'userCount', url: "{{ route('users.count') }}" },
-        { id: 'osocialCount', url: "{{ route('osocial.count') }}" },
-        { id: 'pacienteCount', url: "{{ route('pacientes.count') }}" },
-        { id: 'profesionCount', url: "{{ route('profesiones.count') }}" }
-    ];
-
-    // Hacer todas las solicitudes en paralelo
-    Promise.all(urls.map(item => 
-        axios.get(item.url)
-            .then(response => {
-                document.getElementById(item.id).innerText = response.data.count;
-            })
-            .catch(error => {
-                document.getElementById(item.id).innerText = 'Error';
-                console.error(`Error al obtener el conteo de ${item.id}:`, error);
-            })
-    )).finally(() => {
-        // Ocultar el spinner una vez todas las solicitudes hayan terminado
-        spinners.forEach(spinner => spinner.classList.add('d-none'));
-    });
+    // Realizar una única solicitud para obtener todos los conteos
+    axios.get("{{ route('counts') }}")
+        .then(function (response) {
+            // Actualizar los elementos con los datos recibidos
+            document.getElementById('userCount').innerText = response.data.userCount;
+            document.getElementById('osocialCount').innerText = response.data.osocialCount;
+            document.getElementById('pacienteCount').innerText = response.data.pacienteCount;
+            document.getElementById('profesionCount').innerText = response.data.profesionCount;
+        })
+        .catch(function (error) {
+            // Manejo de error en caso de que falle la solicitud
+            document.getElementById('userCount').innerText = 'Error';
+            document.getElementById('osocialCount').innerText = 'Error';
+            document.getElementById('pacienteCount').innerText = 'Error';
+            document.getElementById('profesionCount').innerText = 'Error';
+            console.error('Error al obtener los conteos:', error);
+        });
 });
+
 
 </script>
 @endpush

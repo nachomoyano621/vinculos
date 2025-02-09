@@ -121,18 +121,7 @@ class ProfesionController extends Controller
         }
     }
     
-
-    // Conteo de profesiones
-    public function count()
-    {
-        try {
-            $count = Profesion::count();
-            return response()->json(['count' => $count]);
-        } catch (\Exception $e) {
-            Log::error('Error al obtener el conteo de profesiones: ' . $e->getMessage());
-            return response()->json(['count' => 0]);
-        }
-    }
+   
 
     // Obtener todas las profesiones
     public function getAll()

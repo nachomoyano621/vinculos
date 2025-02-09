@@ -163,15 +163,5 @@ public function notasData($id)
         return response()->json(['error' => 'Error al obtener notas'], 500);
     }
 }
-     // Conteo de usuarios
-     public function count()
-     {
-         try {
-             $count = Paciente::count();
-             return response()->json(['count' => $count]);
-         } catch (\Exception $e) {
-             Log::error('Error al obtener el conteo de osocial: ' . $e->getMessage());
-             return response()->json(['count' => 0]);
-         }
-     }
+     
 }
