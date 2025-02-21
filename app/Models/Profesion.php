@@ -15,5 +15,8 @@ class Profesion extends Model
         'nombre',
     ];
 
-    
+    public function profesionales()
+    {
+        return $this->hasMany(Profesional::class);
+    }
 }

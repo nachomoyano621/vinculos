@@ -6,6 +6,7 @@ use App\Http\Controllers\OSocialController;
 use App\Http\Controllers\PacienteController;
 use App\Http\Controllers\NotaController;
 use App\Http\Controllers\ProfesionController;
+use App\Http\Controllers\ProfesionalController;
 use Illuminate\Support\Facades\Route;
 
 // Autenticación
@@ -63,6 +64,17 @@ Route::prefix('profesiones')->group(function () {
     Route::get('/{id}', [ProfesionController::class, 'show'])->name('profesiones.show');
     Route::delete('/{id}', [ProfesionController::class, 'destroy'])->name('profesiones.destroy');  
 });
+
+Route::prefix('profesionales')->name('profesionales.')->group(function() {    
+    Route::get('/', [ProfesionalController::class, 'index'])->name('index');   
+    Route::get('/data', [ProfesionalController::class, 'indexData'])->name('indexData');
+    Route::post('/store', [ProfesionalController::class, 'store'])->name('store');
+    Route::get('/{profesional}', [ProfesionalController::class, 'show'])->name('show');
+    Route::put('/{id}', [ProfesionalController::class, 'update'])->name('update');
+    Route::delete('/{profesional}', [ProfesionalController::class, 'destroy'])->name('destroy');    
+    Route::get('/profesiones/all', [ProfesionController::class, 'getAll'])->name('profesion.all'); // Aquí la ruta completa es 'profesionales.profesion.all'
+});
+
 });
 
 

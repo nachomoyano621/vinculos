@@ -67,6 +67,21 @@
                 </div>
             </a>
         </div>
+        <!-- Card de Profesionales -->
+        <div class="col-md-3 mb-4">
+            <a href="{{ route('profesionales.index') }}" style="text-decoration: none;">
+                <div class="card text-white bg-warning h-100">
+                    <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                        <h4 class="card-title mb-3">PROFESIONALES</h4>
+                        <div class="count-wrapper text-center">
+                            <span class="count-number fs-1" id="profesionalesCount" style="letter-spacing: 2px;">
+                                <i class="fa fa-spinner fa-spin fa-1x"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
     </div>
 </div>
 @endsection
@@ -83,6 +98,7 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById('osocialCount').innerText = response.data.osocialCount;
             document.getElementById('pacienteCount').innerText = response.data.pacienteCount;
             document.getElementById('profesionCount').innerText = response.data.profesionCount;
+            document.getElementById('profesionalesCount').innerText = response.data.profesionalesCount;
         })
         .catch(function (error) {
             // Manejo de error en caso de que falle la solicitud
@@ -90,10 +106,9 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById('osocialCount').innerText = 'Error';
             document.getElementById('pacienteCount').innerText = 'Error';
             document.getElementById('profesionCount').innerText = 'Error';
+            document.getElementById('profesionalesCount').innerText = 'Error';
             console.error('Error al obtener los conteos:', error);
         });
 });
-
-
 </script>
 @endpush

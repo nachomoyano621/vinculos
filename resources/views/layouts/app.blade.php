@@ -31,6 +31,7 @@
                                 <li><a class="dropdown-item" href="{{ route('osocial.index') }}">Obra Social</a></li>
                                 <li><a class="dropdown-item" href="{{ route('pacientes.index') }}">Pacientes</a></li>
                                 <li><a class="dropdown-item" href="{{ route('profesiones.index') }}">Profesiones</a></li>
+                                <li><a class="dropdown-item" href="{{ route('profesionales.index') }}">Profesionales</a></li>
                             </ul>
                         </li>
                     </ul>

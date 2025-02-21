@@ -9,6 +9,7 @@ use Log;
 use App\Models\OSocial;
 use App\Models\Paciente;
 use App\Models\Profesion;
+use App\Models\Profesional;
 
 
 class UserController extends Controller
@@ -117,12 +118,14 @@ class UserController extends Controller
             $osocialCount = OSocial::count();
             $pacienteCount = Paciente::count();
             $profesionCount = Profesion::count();
+            $profesionalesCount = Profesional::count();
     
             return response()->json([
                 'userCount' => $userCount,
                 'osocialCount' => $osocialCount,
                 'pacienteCount' => $pacienteCount,
-                'profesionCount' => $profesionCount
+                'profesionCount' => $profesionCount,
+                'profesionalesCount' => $profesionalesCount
             ]);
         } catch (\Exception $e) {
             Log::error('Error al obtener los conteos: ' . $e->getMessage());
@@ -130,7 +133,8 @@ class UserController extends Controller
                 'userCount' => 0,
                 'osocialCount' => 0,
                 'pacienteCount' => 0,
-                'profesionCount' => 0
+                'profesionCount' => 0,
+                'profesionalesCount' => 0
             ]);
         }
     }
