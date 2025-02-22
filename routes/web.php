@@ -68,6 +68,7 @@ Route::prefix('profesiones')->group(function () {
 Route::prefix('profesionales')->name('profesionales.')->group(function() {
     Route::get('/', [ProfesionalController::class, 'index'])->name('index');
     Route::get('/data', [ProfesionalController::class, 'indexData'])->name('indexData');
+    Route::put('/update/{id}', [ProfesionalController::class, 'update'])->name('update'); 
     Route::post('/store', [ProfesionalController::class, 'store'])->name('store');
     Route::get('/{profesional}', [ProfesionalController::class, 'show'])->name('show');
     Route::delete('/destroy/{profesional}', [ProfesionalController::class, 'destroy'])->name('destroy'); 

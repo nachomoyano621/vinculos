@@ -132,7 +132,8 @@
                         <p><strong>Teléfono 2:</strong> <span id="viewTelefono2"></span></p>
                     </div>
                     <div class="col-md-4">
-                        <p><strong>Observaciones:</strong> <span id="viewObservaciones"></span></p>
+                        <p><strong>Observaciones:</strong></p>
+                        <div id="viewObservaciones" class="observaciones-container"></div>
                     </div>
                 </div>
             </div>
@@ -147,6 +148,15 @@
 <style>
     .invalid-feedback { display: block; color: #dc3545; }
     .is-invalid { border-color: #dc3545 !important; }
+    #viewObservaciones {
+        max-height: 150px; /* Altura máxima */
+        overflow-y: auto;  /* Barra de desplazamiento vertical */
+        white-space: pre-wrap; /* Mantener los saltos de línea */
+        word-wrap: break-word; /* Romper palabras largas */       
+        padding: 8px; /* Espaciado interno */
+        background-color: #f9f9f9; /* Fondo opcional */      
+        margin-top: 8px; /* Espacio superior */
+    }
 </style>
 @endpush
 

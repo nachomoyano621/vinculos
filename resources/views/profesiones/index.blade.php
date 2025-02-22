@@ -12,8 +12,7 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Nombre</th>
-                <th>Fecha Creación</th>
+                <th>Nombre</th>               
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -85,16 +84,7 @@ $(document).ready(function () {
         ajax: "{{ route('profesiones.indexData') }}", // Ruta para obtener los datos
         columns: [
             { data: 'id' }, // ID
-            { data: 'nombre' }, // Nombre
-            { 
-                data: 'created_at',
-                render: function (data) {
-                    // Formatear la fecha como DD/MM/AAAA HH:MM
-                    const date = new Date(data);
-                    const formattedDate = `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-                    return formattedDate;
-                }
-            },
+            { data: 'nombre' }, // Nombre          
             { 
                 data: 'id',
                 render: function (data) {
