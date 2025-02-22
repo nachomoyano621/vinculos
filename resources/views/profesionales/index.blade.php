@@ -38,7 +38,7 @@
                         <ul id="errorList"></ul>
                     </div>
 
-                    <!-- Fila 1: Nombre, Apellido, Profesión -->
+                    <!-- Campos del formulario -->
                     <div class="row mb-3">
                         <div class="col-md-4">
                             <label for="nombre" class="form-label">Nombre</label>
@@ -55,8 +55,6 @@
                             </select>
                         </div>
                     </div>
-
-                    <!-- Fila 2: CUIL, DNI, Dirección -->
                     <div class="row mb-3">
                         <div class="col-md-4">
                             <label for="cuil" class="form-label">CUIL</label>
@@ -71,8 +69,6 @@
                             <input type="text" class="form-control" id="direccion" name="direccion">
                         </div>
                     </div>
-
-                    <!-- Fila 3: Teléfono 1, Teléfono 2 -->
                     <div class="row mb-3">
                         <div class="col-md-4">
                             <label for="telefono1" class="form-label">Teléfono 1</label>
@@ -82,11 +78,7 @@
                             <label for="telefono2" class="form-label">Teléfono 2</label>
                             <input type="text" class="form-control" id="telefono2" name="telefono2">
                         </div>
-                    </div>
-
-                    <!-- Fila 4: Observaciones -->
-                    <div class="row mb-3">
-                        <div class="col-md-12">
+                        <div class="col-md-4">
                             <label for="observaciones" class="form-label">Observaciones</label>
                             <textarea class="form-control" id="observaciones" name="observaciones" rows="3"></textarea>
                         </div>
@@ -110,7 +102,6 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <!-- Fila 1: Nombre, Apellido, Profesión -->
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <p><strong>Nombre:</strong> <span id="viewNombre"></span></p>
@@ -122,8 +113,6 @@
                         <p><strong>Profesión:</strong> <span id="viewProfesion"></span></p>
                     </div>
                 </div>
-
-                <!-- Fila 2: CUIL, DNI, Dirección -->
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <p><strong>CUIL:</strong> <span id="viewCuil"></span></p>
@@ -131,9 +120,10 @@
                     <div class="col-md-4">
                         <p><strong>DNI:</strong> <span id="viewDni"></span></p>
                     </div>
+                    <div class="col-md-4">
+                        <p><strong>Dirección:</strong> <span id="viewDireccion"></span></p>
+                    </div>
                 </div>
-
-                <!-- Fila 3: Teléfono 1, Teléfono 2 -->
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <p><strong>Teléfono 1:</strong> <span id="viewTelefono1"></span></p>
@@ -141,11 +131,7 @@
                     <div class="col-md-4">
                         <p><strong>Teléfono 2:</strong> <span id="viewTelefono2"></span></p>
                     </div>
-                </div>
-
-                <!-- Fila 4: Observaciones -->
-                <div class="row mb-3">
-                    <div class="col-md-12">
+                    <div class="col-md-4">
                         <p><strong>Observaciones:</strong> <span id="viewObservaciones"></span></p>
                     </div>
                 </div>
@@ -166,75 +152,34 @@
 
 @push('scripts')
 <script>
-// Configuración global de Axios
-axios.interceptors.response.use(
-    response => response,
-    error => {
-        if (error.response?.status === 422) {
-            showValidationErrors(error.response.data.errors);
-        } else {
-            const errorMessage = error.response?.data?.message || 'Error inesperado';
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: errorMessage,
-            });
-        }
-        return Promise.reject(error);
-    }
-);
-
-function showValidationErrors(errors) {
-    let errorMessages = '';
-    for (let field in errors) {
-        errorMessages += errors[field].join('<br>') + '<br>';
-    }
-    Swal.fire({
-        icon: 'error',
-        title: 'Errores de validación',
-        html: errorMessages,
-        confirmButtonText: 'Cerrar',
-    });
-}
-
-function clearValidationErrors() {
-    $('#validationErrors').addClass('d-none');
-    $('#errorList').empty();
-    $('.is-invalid').removeClass('is-invalid');
-    $('.invalid-feedback').remove();
-}
-
-// Cargar profesiones en el select
-function loadProfesiones() {
-    axios.get("{{ route('profesionales.profesion.all') }}")
-        .then(response => {
-            const profesionSelect = $('#profesion_id');
-            profesionSelect.empty();
-            profesionSelect.append('<option value="">Selecciona una profesión</option>');
-            response.data.forEach(profesion => {
-                profesionSelect.append(`<option value="${profesion.id}">${profesion.nombre}</option>`);
-            });
-        })
-        .catch(error => {
-            console.error('Error al cargar profesiones:', error);
-        });
-}
-
 $(document).ready(function () {
     // Cargar profesiones al iniciar
-    loadProfesiones();
+    function loadProfesiones() {
+        axios.get("{{ route('profesionales.profesion.all') }}")
+            .then(response => {
+                const profesionSelect = $('#profesion_id');
+                profesionSelect.empty();
+                profesionSelect.append('<option value="">Selecciona una profesión</option>');
+                response.data.forEach(profesion => {
+                    profesionSelect.append(`<option value="${profesion.id}">${profesion.nombre}</option>`);
+                });
+            })
+            .catch(error => {
+                console.error('Error al cargar profesiones:', error);
+            });
+    }
 
-    // DataTable
+    // Inicializar DataTables
     const table = $('#profesionalesTable').DataTable({
         processing: true,
         serverSide: true,
-        ajax: '{{ route('profesionales.indexData') }}',
+        ajax: "{{ route('profesionales.indexData') }}",
         columns: [
             { data: 'id' },
             { data: 'nombre' },
             { data: 'apellido' },
-            { data: 'profesion.nombre' },
-            { 
+            { data: 'profesion_nombre' },
+            {
                 data: 'id',
                 render: function (data) {
                     return `
@@ -246,7 +191,7 @@ $(document).ready(function () {
                         </button>
                         <button class="btn btn-sm btn-danger delete-btn" data-id="${data}">
                             <i class="fa fa-trash"></i>
-                        </button>                     
+                        </button>
                     `;
                 }
             }
@@ -275,85 +220,143 @@ $(document).ready(function () {
         ]
     });
 
+    // Cargar profesiones al iniciar
+    loadProfesiones();
 
-
-    // Abrir el modal para agregar un nuevo profesional
-    $('#newProfesionalButton').click(function () {
-        $('#profesionalModal .modal-title').text('Nuevo Profesional');
-        clearValidationErrors();
+    // Nuevo Profesional
+    $('#newProfesionalButton').click(() => {
         $('#profesionalForm')[0].reset();
         $('#profesionalId').val('');
-        $('#profesionalModal').modal('show');
+        $('#profesionalModal .modal-title').text('Nuevo Profesional');
+        new bootstrap.Modal('#profesionalModal').show();
     });
 
-    // Enviar el formulario de crear o editar
-    $('#profesionalForm').submit(function (e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        const profesionalId = $('#profesionalId').val();
-        const url = profesionalId ? `{{ route('profesionales.update', '') }}/${profesionalId}` : '{{ route('profesionales.store') }}';
-        const method = profesionalId ? 'PUT' : 'POST';
-
-        axios({
-            method: method,
-            url: url,
-            data: formData,
-            headers: { 'Content-Type': 'multipart/form-data' },
-        })
-        .then(response => {
-            $('#profesionalModal').modal('hide');
-            table.ajax.reload();
-            Swal.fire('Éxito', 'Profesional guardado correctamente.', 'success');
-        })
-        .catch(error => {
-            if (error.response?.status === 422) {
-                showValidationErrors(error.response.data.errors);
-            }
-        });
-    });
-
-    // Ver detalles de un profesional
-    $(document).on('click', '.viewProfesionalButton', function () {
+    // Editar Profesional
+    $('#profesionalesTable').on('click', '.edit-btn', function () {
         const profesionalId = $(this).data('id');
-        axios.get(`{{ route('profesionales.show', '') }}/${profesionalId}`)
+        axios.get(`/profesionales/${profesionalId}`) // Ruta corregida
             .then(response => {
-                const profesional = response.data;
-                $('#viewNombre').text(profesional.nombre);
-                $('#viewApellido').text(profesional.apellido);
-                $('#viewProfesion').text(profesional.profesion.nombre);
-                $('#viewCuil').text(profesional.cuil);
-                $('#viewDni').text(profesional.dni);
-                $('#viewTelefono1').text(profesional.telefono1);
-                $('#viewTelefono2').text(profesional.telefono2);
-                $('#viewObservaciones').text(profesional.observaciones);
-                $('#viewProfesionalModal').modal('show');
+                // Asignar valores a los campos del formulario
+                $('#profesionalId').val(response.data.id);
+                $('#nombre').val(response.data.nombre);
+                $('#apellido').val(response.data.apellido);
+                $('#profesion_id').val(response.data.profesion_id);
+                $('#cuil').val(response.data.cuil);
+                $('#dni').val(response.data.dni);
+                $('#direccion').val(response.data.direccion);
+                $('#telefono1').val(response.data.telefono1);
+                $('#telefono2').val(response.data.telefono2);
+                $('#observaciones').val(response.data.observaciones);
+
+                // Cambiar título del modal a "Editar Profesional"
+                $('#profesionalModal .modal-title').text('Editar Profesional');
+                
+                // Abrir el modal
+                new bootstrap.Modal('#profesionalModal').show();
             })
-            .catch(error => console.error('Error al obtener detalles del profesional:', error));
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error al cargar los datos del profesional',
+                });
+            });
     });
 
-    // Eliminar un profesional
-    $(document).on('click', '.deleteProfesionalButton', function () {
+    // Ver Detalles
+    $('#profesionalesTable').on('click', '.view-btn', function () {
+        const profesionalId = $(this).data('id');
+        axios.get(`/profesionales/${profesionalId}`)
+            .then(response => {
+                // Llenar el modal con los datos del profesional
+                $('#viewNombre').text(response.data.nombre);
+                $('#viewApellido').text(response.data.apellido);
+                $('#viewProfesion').text(response.data.profesion?.nombre || 'Sin profesión');
+                $('#viewCuil').text(response.data.cuil || 'No especificado');
+                $('#viewDni').text(response.data.dni || 'No especificado');
+                $('#viewDireccion').text(response.data.direccion || 'No especificado');
+                $('#viewTelefono1').text(response.data.telefono1 || 'No especificado');
+                $('#viewTelefono2').text(response.data.telefono2 || 'No especificado');
+                $('#viewObservaciones').text(response.data.observaciones || 'No especificado');
+                // Mostrar el modal
+                new bootstrap.Modal('#viewProfesionalModal').show();
+            })
+            .catch(error => {
+                if (error.response?.status === 404) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Profesional no encontrado',
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error inesperado al obtener los detalles del profesional',
+                    });
+                }
+            });
+    });
+
+    // Eliminar Profesional
+    $('#profesionalesTable').on('click', '.delete-btn', function () {
         const profesionalId = $(this).data('id');
         Swal.fire({
-            title: '¿Estás seguro?',
-            text: "No podrás revertir esta acción",
+            title: '¿Eliminar profesional?',
+            text: "Esta acción no se puede deshacer",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Sí, eliminarlo',
-            cancelButtonText: 'Cancelar'
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Eliminar'
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.delete(`{{ route('profesionales.destroy', '') }}/${profesionalId}`)
-                    .then(response => {
-                        Swal.fire('Eliminado!', 'El profesional ha sido eliminado.', 'success');
+                axios.delete(`/profesionales/destroy/${profesionalId}`)
+                    .then(() => {
                         table.ajax.reload();
-                    })
-                    .catch(error => {
-                        Swal.fire('Error', 'Hubo un problema al eliminar al profesional.', 'error');
+                        Swal.fire('¡Eliminado!', '', 'success');
                     });
             }
         });
     });
+
+    // Enviar Formulario
+    $('#profesionalForm').submit(function (e) {
+        e.preventDefault();
+        const formData = $(this).serialize();
+        const profesionalId = $('#profesionalId').val();
+        const method = profesionalId ? 'put' : 'post';
+        const url = profesionalId ? `/profesionales/update/${profesionalId}` : '/profesionales/store';
+
+        axios[method](url, formData)
+            .then(() => {
+                table.ajax.reload();
+                $('#profesionalModal').modal('hide');
+                Swal.fire('¡Éxito!', 'Operación realizada correctamente', 'success');
+            })
+            .catch(error => {
+                if (error.response?.status === 422) {
+                    const errors = error.response.data.errors;
+                    let errorMessages = '';
+                    for (let field in errors) {
+                        errorMessages += errors[field].join('<br>') + '<br>';
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Errores de validación',
+                        html: errorMessages,
+                        confirmButtonText: 'Cerrar',
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: error.response?.data?.message || 'Error inesperado',
+                    });
+                }
+            });
+    });
 });
 </script>
 @endpush
+@endsection
